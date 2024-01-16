@@ -31,13 +31,29 @@ const mostBlogs = blogs => {
     .toPairs()
     .maxBy(_.last)
     .value();
-  console.log('🚀 ~ mostBlogs ~ mostFrequent:', mostFrequent);
   return { author: mostFrequent[0], blogs: mostFrequent[1] };
+};
+
+const mostLikes = blogs => {
+  if (!blogs.length) {
+    return null;
+  }
+  const authorLikes = _.chain(blogs)
+    .groupBy('author')
+    .map((blogs, author) => ({
+      author,
+      likes: _.sumBy(blogs, 'likes')
+    }))
+    .value();
+  // Find the author with the most likes
+  const mostLikedAuthor = _.maxBy(authorLikes, 'likes');
+  return mostLikedAuthor;
 };
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 };
