@@ -3,9 +3,9 @@ POST http://localhost:3003/api/blogs/
 Content-Type: application/json
 
 {
-  "title": "Understanding Async/Await in JavaScript",
-  "author": "Kyle Simpson",
-  "url": "https://javascript.info/async-await",
-  "likes": 15
+  "title": "Understanding",
+  "author": "Kyle",
+  "url": "https://javascript.info/",
+  "likes": 1
 }
 
