@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "lodash": "^4.17.21",
     "mongoose": "^7.6.8"
   },
   "devDependencies": {

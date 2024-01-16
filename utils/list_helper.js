@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const dummy = blogs => {
   return 1;
 };
@@ -20,8 +22,22 @@ const favoriteBlog = blogs => {
   return favBlog;
 };
 
+const mostBlogs = blogs => {
+  if (!blogs.length) {
+    return null;
+  }
+  const mostFrequent = _.chain(blogs)
+    .countBy('author')
+    .toPairs()
+    .maxBy(_.last)
+    .value();
+  console.log('🚀 ~ mostBlogs ~ mostFrequent:', mostFrequent);
+  return { author: mostFrequent[0], blogs: mostFrequent[1] };
+};
+
 module.exports = {
   dummy,
   totalLikes,
-  favoriteBlog
+  favoriteBlog,
+  mostBlogs
 };
