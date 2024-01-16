@@ -4,8 +4,7 @@ const dummy = blogs => {
 
 const totalLikes = blogs => {
   return blogs.reduce((prev, cur) => {
-    const likes = cur.likes ? cur.likes : 0;
-    return prev + likes;
+    return prev + (cur.likes ?? 0);
   }, 0);
 };
 
