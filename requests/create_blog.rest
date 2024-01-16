@@ -3,9 +3,9 @@ POST http://localhost:3003/api/blogs/
 Content-Type: application/json
 
 {
-  "title": "Understanding",
-  "author": "Kyle",
-  "url": "https://javascript.info/",
-  "likes": 1
+  "title": "Understanding2",
+  "author": "Kyle2",
+  "url": "https://javascript.info/2",
+  "likes": 2
 }
 

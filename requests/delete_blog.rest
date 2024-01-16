@@ -1,0 +1,7 @@
+# should be found
+DELETE http://localhost:3003/api/blogs/1
+
+###
+
+# should not be found
+DELETE http://localhost:3003/api/blogs/15

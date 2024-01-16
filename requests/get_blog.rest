@@ -1,0 +1,7 @@
+# should be found
+GET http://localhost:3003/api/blogs/65a525e141f0d98fbc6c8bf7
+
+###
+
+# should not be found
+GET http://localhost:3003/api/blogs/15

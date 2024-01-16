@@ -1,0 +1,13 @@
+# should be found
+PUT http://localhost:3003/api/blogs/65a4d73e85020de044dd4933
+Content-Type: application/json
+
+{
+  "name": "jane doe",
+  "number": "777"
+}
+
+###
+
+# should not be found
+PUT http://localhost:3003/api/blogs/15
