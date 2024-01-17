@@ -42,7 +42,9 @@ const blogs = [
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(
+    'mongodb+srv://bt23:123123aa@cluster0.ktlwnkg.mongodb.net/test-fso-blog?retryWrites=true&w=majority'
+  )
   .then(() => {
     console.log('Connected to MongoDB');
 
