@@ -125,6 +125,36 @@ test('a blog post can be deleted', async () => {
   expect(blogsAtEnd.map(b => b._id)).not.toContain(createdBlog.id);
 });
 
+test('number of likes for a blog post can be updated', async () => {
+  // Create a new blog post
+  const newBlog = {
+    title: 'Blog to Update',
+    author: 'Updater',
+    url: 'http://toupdate.com',
+    likes: 1
+  };
+
+  const createdBlogResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const createdBlog = createdBlogResponse.body;
+
+  // Update the likes of the created blog post
+  const updatedBlog = {
+    ...createdBlog,
+    likes: 2 // Increment likes
+  };
+
+  await api.put(`/api/blogs/${createdBlog._id}`).send(updatedBlog).expect(200);
+
+  // Fetch the updated blog post and verify the likes
+  const updatedBlogResponse = await api.get(`/api/blogs/${createdBlog._id}`);
+  expect(updatedBlogResponse.body.likes).toBe(2);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
