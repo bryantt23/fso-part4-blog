@@ -99,6 +99,32 @@ test('blog without url is not added and returns status 400', async () => {
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
 });
 
+test('a blog post can be deleted', async () => {
+  // Create a new blog post
+  const newBlog = {
+    title: 'Blog to be deleted',
+    author: 'Deleter',
+    url: 'http://tobedeleted.com',
+    likes: 1
+  };
+
+  const createdBlogResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const createdBlog = createdBlogResponse.body;
+
+  // Delete the created blog post
+  await api.delete(`/api/blogs/${createdBlog._id}`).expect(204); // 204 No Content is a common response for successful DELETE operations
+
+  // Verify that the blog post has been deleted
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+  expect(blogsAtEnd.map(b => b._id)).not.toContain(createdBlog.id);
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
