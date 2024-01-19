@@ -195,6 +195,27 @@ test('number of likes for a blog post can be updated', async () => {
   expect(updatedBlogResponse.body.likes).toBe(2);
 });
 
+test('adding a blog fails with status code 401 Unauthorized if token is not provided', async () => {
+  const newBlog = {
+    title: 'Unauthorized Blog',
+    author: 'Unknown Author',
+    url: 'http://unauthorizedblog.com',
+    likes: 1
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length); // No new blog should be added
+
+  const titles = blogsAtEnd.map(b => b.title);
+  expect(titles).not.toContain('Unauthorized Blog'); // The new blog should not be found
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
