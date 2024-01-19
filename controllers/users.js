@@ -1,11 +1,12 @@
 const { body, validationResult } = require('express-validator');
 const usersRouter = require('express').Router();
 const User = require('../models/user');
-const Blog = require('../models/blog');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
 
 usersRouter.post(
-  '/',
+  '/sign-up',
   [
     body('username', 'Username must be at least 3 characters long').isLength({
       min: 3
@@ -45,6 +46,28 @@ usersRouter.post(
     }
   }
 );
+
+usersRouter.post('/', async (request, response) => {
+  const { username, password } = request.body;
+
+  const user = await User.findOne({ username });
+  const passwordCorrect =
+    user === null ? false : await bcrypt.compare(password, user.password);
+
+  if (!(user && passwordCorrect)) {
+    return response.status(401).json({
+      error: 'invalid username or password'
+    });
+  }
+
+  const userForToken = { username: user.username, id: user._id };
+
+  const token = jwt.sign(userForToken, process.env.SECRET);
+
+  response
+    .status(200)
+    .send({ token, username: user.useername, name: user.name });
+});
 
 usersRouter.get('/', async (req, res) => {
   try {
