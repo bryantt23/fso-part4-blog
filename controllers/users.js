@@ -6,14 +6,20 @@ const bcrypt = require('bcryptjs');
 usersRouter.post(
   '/',
   [
-    [body('username', 'Invalid username').notEmpty()],
+    body('username', 'Username must be at least 3 characters long').isLength({
+      min: 3
+    }),
     [body('name', 'Invalid name').notEmpty()],
-    [body('password', 'Invalid password').notEmpty()]
+    [
+      body('password', 'Password must be at least 3 characters long').isLength({
+        min: 3
+      })
+    ]
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: errors.array() });
     }
 
     try {
