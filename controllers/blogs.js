@@ -1,6 +1,16 @@
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+const getTokenFrom = request => {
+  const authorization = request.get('authorization');
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '');
+  }
+  return null;
+};
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({});
@@ -14,38 +24,24 @@ blogsRouter.get('/:id', async (request, response) => {
 
 blogsRouter.post('/', async (request, response, next) => {
   try {
-    const users = await User.find({});
-    console.log('Users:', users);
-
-    const userCount = await User.countDocuments();
-    console.log('User Count:', userCount);
-
-    // If there are no users, return an error
-    if (userCount === 0) {
-      return response.status(404).json({ error: 'No users found' });
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' });
     }
-
-    // Generate a random number (0 to userCount - 1)
-    const randomUserIndex = Math.floor(Math.random() * userCount);
-
-    const randomUser = await User.findOne().skip(randomUserIndex);
-    if (!randomUser) {
-      return response.status(404).json({ error: 'User not found' });
-    }
-
+    const user = await User.findById(decodedToken.id);
     const blogData = {
       ...request.body,
-      user: randomUser._id
+      user: user._id
     };
 
     const blog = new Blog(blogData);
     const savedBlog = await blog.save();
 
-    if (!randomUser.blogs) {
-      randomUser.blogs = [];
+    if (!user.blogs) {
+      user.blogs = [];
     }
-    randomUser.blogs = randomUser.blogs.concat(savedBlog._id);
-    await randomUser.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
 
     response.status(201).json(savedBlog);
   } catch (error) {
