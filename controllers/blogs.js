@@ -1,8 +1,6 @@
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
 const User = require('../models/user');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({});
@@ -16,11 +14,11 @@ blogsRouter.get('/:id', async (request, response) => {
 
 blogsRouter.post('/', async (request, response, next) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    if (!decodedToken.id) {
+    if (!request.token) {
       return response.status(401).json({ error: 'token invalid' });
     }
-    const user = await User.findById(decodedToken.id);
+
+    const user = request.user;
     const blogData = {
       ...request.body,
       user: user._id
@@ -43,24 +41,29 @@ blogsRouter.post('/', async (request, response, next) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   try {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET);
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' });
+    // Check if user is extracted from the token
+    if (!request.user) {
+      return response.status(401).json({ error: 'token missing or invalid' });
     }
 
-    const blog = await Blog.findByIdAndDelete(request.params.id);
+    // Find the blog
+    const blog = await Blog.findById(request.params.id);
     if (!blog) {
       return response.status(404).json({ error: 'blog not found' });
     }
 
-    if (blog.user.toString() !== decodedToken.id) {
+    // Check if the blog's user matches the authenticated user
+    if (blog.user.toString() !== request.user._id.toString()) {
       return response
         .status(401)
         .json({ error: 'only the creator can delete a blog' });
     }
+
+    // Delete the blog
     await Blog.findByIdAndDelete(request.params.id);
 
-    await User.findByIdAndUpdate(decodedToken.id, {
+    // Remove the blog from the user's list of blogs
+    await User.findByIdAndUpdate(request.user._id, {
       $pull: { blogs: blog._id }
     });
 

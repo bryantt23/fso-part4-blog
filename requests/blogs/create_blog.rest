@@ -4,8 +4,8 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YWEyOGI0MzUyNjNhZDY4MTQ5N2VjMSIsImlhdCI6MTcwNTY2MDgwMn0.waUSdsRbeLmPBKnpw0sNjV_Zq7rYACmyvGZXPWvodyE
 
 {
-  "title": "Understanding 12",
-  "author": "Kyle 12",
-  "url": "https://javascript.info/ 12",
-  "likes":  12
+  "title": "Understanding 16",
+  "author": "Kyle 16",
+  "url": "https://javascript.info/ 16",
+  "likes":  16
 }

@@ -1,15 +1,7 @@
 # should be found
-DELETE http://localhost:3003/api/blogs/65aa51a0b2d0703fdd978783
+DELETE http://localhost:3003/api/blogs/65aa6d892fbbcff62bb21302
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YWEyOGI0MzUyNjNhZDY4MTQ5N2VjMSIsImlhdCI6MTcwNTY2MDgwMn0.waUSdsRbeLmPBKnpw0sNjV_Zq7rYACmyvGZXPWvodyE
-
-{
-  "title": "Understanding 12",
-  "author": "Kyle 12",
-  "url": "https://javascript.info/ 12",
-  "likes":  12
-}
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YWEyOGI0MzUyNjNhZDY4MTQ5N2VjMSIsImlhdCI6MTcwNTY2NTk5NX0.xYwbznKI1zCn3CE0gZDeZHyvsSpCApwlGonwgcZps_E
 
 ###
 
