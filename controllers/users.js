@@ -1,6 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const usersRouter = require('express').Router();
 const User = require('../models/user');
+const Blog = require('../models/blog');
 const bcrypt = require('bcryptjs');
 
 usersRouter.post(
@@ -46,8 +47,12 @@ usersRouter.post(
 );
 
 usersRouter.get('/', async (req, res) => {
-  const users = await User.find({});
-  res.json(users);
+  try {
+    const users = await User.find({}).populate('blogs');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 module.exports = usersRouter;
