@@ -1,17 +1,42 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../index');
-const helper = require('./test_helper');
-const api = supertest(app);
 const Blog = require('../models/blog');
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const api = supertest(app);
+const helper = require('./test_helper');
+
+const testUser = {
+  username: 'testuser',
+  password: 'testpassword',
+  name: 'Test User'
+};
+let token; // Token for authenticated requests
+let user; // User for the test cases
+
+beforeAll(async () => {
+  await User.deleteMany({});
+
+  user = new User(testUser);
+  await user.save();
+
+  // Generate a token for the test user
+  const userForToken = {
+    username: testUser.username,
+    id: user._id
+  };
+  token = jwt.sign(userForToken, process.env.SECRET);
+});
 
 beforeEach(async () => {
   await Blog.deleteMany({});
 
-  for (const blogItem of helper.initialBlogs) {
-    let blogObject = new Blog(blogItem);
-    await blogObject.save();
-  }
+  const blogObjects = helper.initialBlogs.map(
+    blog => new Blog({ ...blog, user: user._id })
+  );
+  const promiseArray = blogObjects.map(blog => blog.save());
+  await Promise.all(promiseArray);
 });
 
 test('blogs are returned as json', async () => {
@@ -44,6 +69,7 @@ test('a valid blog can be added', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/);
@@ -51,7 +77,7 @@ test('a valid blog can be added', async () => {
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1);
 
-  const titles = blogsAtEnd.map(r => r.title);
+  const titles = blogsAtEnd.map(b => b.title);
   expect(titles).toContain('Test Blog');
 });
 
@@ -64,6 +90,7 @@ test('likes property defaults to 0 if missing', async () => {
 
   const response = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlogWithoutLikes)
     .expect(201)
     .expect('Content-Type', /application\/json/);
@@ -80,7 +107,11 @@ test('blog without title is not added and returns status 400', async () => {
     likes: 4
   };
 
-  await api.post('/api/blogs').send(newBlogWithoutTitle).expect(400);
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlogWithoutTitle)
+    .expect(400);
 
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
@@ -93,7 +124,11 @@ test('blog without url is not added and returns status 400', async () => {
     likes: 2
   };
 
-  await api.post('/api/blogs').send(newBlogWithoutUrl).expect(400);
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
+    .send(newBlogWithoutUrl)
+    .expect(400);
 
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
@@ -110,6 +145,7 @@ test('a blog post can be deleted', async () => {
 
   const createdBlogResponse = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/);
@@ -117,7 +153,10 @@ test('a blog post can be deleted', async () => {
   const createdBlog = createdBlogResponse.body;
 
   // Delete the created blog post
-  await api.delete(`/api/blogs/${createdBlog._id}`).expect(204); // 204 No Content is a common response for successful DELETE operations
+  await api
+    .delete(`/api/blogs/${createdBlog._id}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(204); // 204 No Content is a common response for successful DELETE operations
 
   // Verify that the blog post has been deleted
   const blogsAtEnd = await helper.blogsInDb();
@@ -136,6 +175,7 @@ test('number of likes for a blog post can be updated', async () => {
 
   const createdBlogResponse = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/);
