@@ -49,6 +49,11 @@ usersRouter.post(
 
 usersRouter.post('/', async (request, response) => {
   const { username, password } = request.body;
+  console.log(
+    '🚀 ~ usersRouter.post ~  username, password:',
+    username,
+    password
+  );
 
   const user = await User.findOne({ username });
   const passwordCorrect =
@@ -66,7 +71,7 @@ usersRouter.post('/', async (request, response) => {
 
   response
     .status(200)
-    .send({ token, username: user.useername, name: user.name });
+    .send({ token, username: user.username, name: user.name });
 });
 
 usersRouter.get('/', async (req, res) => {
