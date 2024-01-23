@@ -19,6 +19,11 @@ app.use(userExtractor);
 app.use('/api/blogs', blogsRouter);
 app.use('/api/users', usersRouter);
 
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
+
 app.use((error, req, res, next) => {
   if (error.name === 'ValidationError') {
     return res.status(400).json({ error: error.message });
